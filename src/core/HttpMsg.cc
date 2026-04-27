@@ -694,7 +694,6 @@ void HttpResp::Error(int error_code, const std::string &errmsg)
     default:
         break;
     }
-    this->headers["Content-Type"] = "application/json";
     this->set_status(status_code);
     wfrest::Json js;
     std::string resp_msg = error_code_to_str(error_code);
@@ -958,7 +957,10 @@ void HttpResp::Save(const std::string &file_dst, std::string &&content,
 
 void HttpResp::Json(const wfrest::Json &json)
 {
-    this->headers["Content-Type"] = "application/json";
+    if (this->headers.count("Content-Type") == 0)
+        this->headers["Content-Type"] = "application/json";
+    else
+        this->headers["Content-Type"].insert(0, "application/json; ");
     this->String(json.dump());
 }
 
@@ -969,7 +971,10 @@ void HttpResp::Json(const std::string &str)
         this->Error(StatusJsonInvalid);
         return;
     }
-    this->headers["Content-Type"] = "application/json";
+    if (this->headers.count("Content-Type") == 0)
+        this->headers["Content-Type"] = "application/json";
+    else
+        this->headers["Content-Type"].insert(0, "application/json; ");
     this->String(str);
 }
 
